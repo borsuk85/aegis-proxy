@@ -1,0 +1,30 @@
+# Aegis Configuration File
+# This file is the primary way to configure the caching reverse proxy
+
+# Server configuration
+server:
+  # Listen address
+  listen: ":8009"
+
+  # Upstream service URL
+  upstream: "http://localhost:3030"
+
+  # Timeout for upstream requests
+  timeout: "1s"
+
+# Cache configuration
+cache:
+  # Time-to-live for cached entries (0 = no expiration)
+  ttl: "5m"
+
+  # HTTP headers to include in cache key
+  # This allows you to cache responses differently based on request headers
+  # Examples:
+  #   - Authorization: Different cache per user
+  #   - Accept-Language: Different cache per language
+  #   - X-Tenant-ID: Different cache per tenant
+  key_headers:
+    - Authorization
+    - Accept-Language
+    # - X-Tenant-ID
+    # - X-Custom-Header

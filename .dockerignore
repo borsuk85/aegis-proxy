@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Build artifacts
+aegis
+*.exe
+
+# Test files
+*_test.go
+test_requests.sh
+
+# Documentation
+README.md
+LICENSE
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore

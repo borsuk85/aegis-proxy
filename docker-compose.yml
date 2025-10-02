@@ -1,0 +1,25 @@
+services:
+  # Mock upstream for testing
+  upstream:
+    image: kennethreitz/httpbin
+    container_name: aegis-upstream
+    networks:
+      - aegis-net
+
+  # Aegis caching proxy
+  aegis:
+    build: .
+    container_name: aegis-proxy
+    ports:
+      - "8010:8010"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    depends_on:
+      - upstream
+    networks:
+      - aegis-net
+    restart: unless-stopped
+
+networks:
+  aegis-net:
+    driver: bridge
