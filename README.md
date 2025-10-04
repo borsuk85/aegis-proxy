@@ -1,5 +1,9 @@
 # Aegis
 
+[![CI](https://github.com/USER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/USER/REPO/actions/workflows/ci.yml)
+[![Docker](https://github.com/USER/REPO/actions/workflows/docker.yml/badge.svg)](https://github.com/USER/REPO/actions/workflows/docker.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/USER/REPO)](https://goreportcard.com/report/github.com/USER/REPO)
+
 Caching reverse proxy with failover mechanism providing high availability for upstream services.
 
 ## Features
@@ -252,6 +256,23 @@ Tests are organized in respective packages:
 - **internal/utils**: URL joining, header filtering, context management (7 tests)
 
 Total: **26 unit and integration tests**
+
+## CI/CD
+
+GitHub Actions workflows automatically run on every push and pull request:
+
+### CI Pipeline (.github/workflows/ci.yml)
+- **Test**: Runs all tests with race detection on Go 1.23 and 1.24
+- **Lint**: Runs `go vet` and `staticcheck` for code quality
+- **Build**: Compiles binary and uploads as artifact
+- **Coverage**: Uploads test coverage to Codecov (optional)
+
+### Docker Pipeline (.github/workflows/docker.yml)
+- Builds Docker image on every push
+- Tags images based on branch/tag/commit SHA
+- Can push to GitHub Container Registry (commented out by default)
+
+To enable image publishing, uncomment the push steps in `docker.yml` and ensure `GITHUB_TOKEN` has package write permissions.
 
 ## Test Script
 
