@@ -330,4 +330,4 @@ curl -X POST http://localhost:8009/api/data -d '{"test": true}'
 
 ## License
 
-CDP/Aegis Project
+Aegis Project
