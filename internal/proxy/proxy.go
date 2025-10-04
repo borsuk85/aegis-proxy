@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"Aegis/internal/cache"
+	"Aegis/internal/logger"
 	"Aegis/internal/utils"
 	"fmt"
 	"io"
@@ -18,10 +19,11 @@ type Proxy struct {
 	cache      *cache.Cache
 	ttl        time.Duration
 	keyHeaders []string
+	logger     *logger.Logger
 }
 
 // New creates a new proxy instance
-func New(upstreamStr string, timeout time.Duration, ttl time.Duration, keyHeaders []string) (*Proxy, error) {
+func New(upstreamStr string, timeout time.Duration, ttl time.Duration, keyHeaders []string, log *logger.Logger) (*Proxy, error) {
 	u, err := url.Parse(upstreamStr)
 	if err != nil {
 		return nil, fmt.Errorf("parse upstream: %w", err)
@@ -41,6 +43,10 @@ func New(upstreamStr string, timeout time.Duration, ttl time.Duration, keyHeader
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 
+	if log != nil {
+		log.Info("proxy initialized: upstream=%s timeout=%s ttl=%s", upstreamStr, timeout, ttl)
+	}
+
 	return &Proxy{
 		upstream: u,
 		client: &http.Client{
@@ -50,6 +56,7 @@ func New(upstreamStr string, timeout time.Duration, ttl time.Duration, keyHeader
 		cache:      cache.New(),
 		ttl:        ttl,
 		keyHeaders: keyHeaders,
+		logger:     log,
 	}, nil
 }
 
@@ -92,8 +99,14 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	utils.CopyHeadersForUpstream(req.Header, r.Header)
 
 	// Send to upstream
+	if p.logger != nil {
+		p.logger.Debug("sending request to upstream: %s %s", r.Method, upURL.String())
+	}
 	resp, err := p.client.Do(req)
 	if err != nil {
+		if p.logger != nil {
+			p.logger.Error("upstream request failed: %v", err)
+		}
 		if cacheable {
 			p.tryServeFromCache(w, r, cacheKey, err)
 		} else {
@@ -106,6 +119,9 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Read response body
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
+		if p.logger != nil {
+			p.logger.Error("failed to read upstream response: %v", err)
+		}
 		if cacheable {
 			p.tryServeFromCache(w, r, cacheKey, fmt.Errorf("read upstream body: %w", err))
 		} else {
@@ -116,6 +132,9 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// If 5xx -> fallback to cache (only for cacheable)
 	if resp.StatusCode >= 500 && cacheable {
+		if p.logger != nil {
+			p.logger.Error("upstream returned 5xx status: %d", resp.StatusCode)
+		}
 		p.tryServeFromCache(w, r, cacheKey, fmt.Errorf("upstream status %d", resp.StatusCode))
 		return
 	}
@@ -136,6 +155,9 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		p.cache.Set(cacheKey, entry)
 		saved = true
+		if p.logger != nil {
+			p.logger.Debug("response saved to cache: key=%s status=%d size=%d", cacheKey, resp.StatusCode, len(respBody))
+		}
 	}
 
 	// Set X-Cache header
@@ -154,6 +176,9 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (p *Proxy) tryServeFromCache(w http.ResponseWriter, r *http.Request, key string, cause error) {
 	if cached, ok := p.cache.Get(key); ok {
 		// We have a cached copy - send as backup
+		if p.logger != nil {
+			p.logger.Info("serving from cache backup: key=%s cause=%v", key, cause)
+		}
 		utils.CopyHeadersForClient(w.Header(), cached.Header)
 		w.Header().Set("X-Served-By", "Aegis")
 		w.Header().Set("X-Cache", "HIT-BACKUP")
@@ -163,6 +188,9 @@ func (p *Proxy) tryServeFromCache(w http.ResponseWriter, r *http.Request, key st
 		return
 	}
 	// No cache - return 502 error
+	if p.logger != nil {
+		p.logger.Error("no cached backup available: key=%s cause=%v", key, cause)
+	}
 	http.Error(w, "Bad Gateway (no cached backup): "+cause.Error(), http.StatusBadGateway)
 }
 

@@ -21,7 +21,7 @@ func TestProxyForwarding(t *testing.T) {
 	defer upstream.Close()
 
 	// Create proxy
-	p, err := New(upstream.URL, 5*time.Second, 0, nil)
+	p, err := New(upstream.URL, 5*time.Second, 0, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create proxy: %v", err)
 	}
@@ -59,7 +59,7 @@ func TestProxyCacheFailover(t *testing.T) {
 	}))
 	defer upstream.Close()
 
-	p, err := New(upstream.URL, 5*time.Second, 0, nil)
+	p, err := New(upstream.URL, 5*time.Second, 0, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create proxy: %v", err)
 	}
@@ -100,7 +100,7 @@ func TestProxyNoCacheForPOST(t *testing.T) {
 	}))
 	defer upstream.Close()
 
-	p, err := New(upstream.URL, 5*time.Second, 0, nil)
+	p, err := New(upstream.URL, 5*time.Second, 0, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create proxy: %v", err)
 	}
@@ -120,7 +120,7 @@ func TestProxyNoCacheForPOST(t *testing.T) {
 }
 
 func TestProxyStatsHandler(t *testing.T) {
-	p, err := New("http://example.com", 5*time.Second, 0, nil)
+	p, err := New("http://example.com", 5*time.Second, 0, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create proxy: %v", err)
 	}
@@ -156,7 +156,7 @@ func TestProxyTimeout(t *testing.T) {
 	defer upstream.Close()
 
 	// Proxy with very short timeout
-	p, err := New(upstream.URL, 50*time.Millisecond, 0, nil)
+	p, err := New(upstream.URL, 50*time.Millisecond, 0, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create proxy: %v", err)
 	}
@@ -179,7 +179,7 @@ func TestProxyCacheWithTTL(t *testing.T) {
 	defer upstream.Close()
 
 	// Proxy with 100ms TTL
-	p, err := New(upstream.URL, 5*time.Second, 100*time.Millisecond, nil)
+	p, err := New(upstream.URL, 5*time.Second, 100*time.Millisecond, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create proxy: %v", err)
 	}
@@ -218,7 +218,7 @@ func TestProxyHeaderPropagation(t *testing.T) {
 	}))
 	defer upstream.Close()
 
-	p, err := New(upstream.URL, 5*time.Second, 0, nil)
+	p, err := New(upstream.URL, 5*time.Second, 0, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create proxy: %v", err)
 	}
@@ -237,7 +237,7 @@ func TestProxyHeaderPropagation(t *testing.T) {
 }
 
 func TestProxyCacheKey(t *testing.T) {
-	p, _ := New("http://example.com", 5*time.Second, 0, nil)
+	p, _ := New("http://example.com", 5*time.Second, 0, nil, nil)
 
 	req1 := httptest.NewRequest("GET", "/api/users?page=1", nil)
 	req2 := httptest.NewRequest("GET", "/api/users?page=2", nil)
@@ -271,7 +271,7 @@ func TestFullProxyFlow(t *testing.T) {
 	}))
 	defer upstream.Close()
 
-	p, err := New(upstream.URL, 5*time.Second, 0, nil)
+	p, err := New(upstream.URL, 5*time.Second, 0, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create proxy: %v", err)
 	}

@@ -17,6 +17,7 @@ type Config struct {
 	Timeout  time.Duration
 	TTL      time.Duration
 	Cache    CacheConfig
+	Logging  LoggingConfig
 }
 
 // CacheConfig holds cache-specific configuration
@@ -24,6 +25,13 @@ type CacheConfig struct {
 	// KeyHeaders is a list of HTTP headers to include in cache key
 	// This allows caching different responses for different header values
 	KeyHeaders []string
+}
+
+// LoggingConfig holds logging configuration
+type LoggingConfig struct {
+	Enabled   bool   // Enable/disable all logging
+	AccessLog bool   // Enable/disable access log
+	Level     string // Log level: debug, info, error
 }
 
 // FileConfig represents the structure of the YAML config file
@@ -37,6 +45,11 @@ type FileConfig struct {
 		TTL        string   `yaml:"ttl"`
 		KeyHeaders []string `yaml:"key_headers"`
 	} `yaml:"cache"`
+	Logging struct {
+		Enabled   bool   `yaml:"enabled"`
+		AccessLog bool   `yaml:"access_log"`
+		Level     string `yaml:"level"`
+	} `yaml:"logging"`
 }
 
 // Load loads configuration from YAML file
@@ -61,6 +74,14 @@ func Load() *Config {
 		log.Fatalf("invalid ttl in config: %v", err)
 	}
 
+	// Set logging defaults
+	loggingEnabled := fileConfig.Logging.Enabled
+	accessLog := fileConfig.Logging.AccessLog
+	logLevel := fileConfig.Logging.Level
+	if logLevel == "" {
+		logLevel = "info"
+	}
+
 	return &Config{
 		Listen:   fileConfig.Server.Listen,
 		Upstream: fileConfig.Server.Upstream,
@@ -68,6 +89,11 @@ func Load() *Config {
 		TTL:      ttl,
 		Cache: CacheConfig{
 			KeyHeaders: fileConfig.Cache.KeyHeaders,
+		},
+		Logging: LoggingConfig{
+			Enabled:   loggingEnabled,
+			AccessLog: accessLog,
+			Level:     logLevel,
 		},
 	}
 }

@@ -28,3 +28,18 @@ cache:
     - Accept-Language
     # - X-Tenant-ID
     # - X-Custom-Header
+
+# Logging configuration
+logging:
+  # Enable/disable logging (default: false)
+  enabled: true
+
+  # Enable/disable access log (default: false)
+  # Access log records: client IP, method, path, status, duration, cache status
+  access_log: true
+
+  # Log level: debug, info, error (default: info)
+  # - debug: All logs including detailed operation traces
+  # - info: General information and cache operations
+  # - error: Only errors and failures
+  level: "info"

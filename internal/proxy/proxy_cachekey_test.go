@@ -7,7 +7,7 @@ import (
 
 func TestCacheKeyWithHeaders(t *testing.T) {
 	// Proxy with Authorization header in cache key
-	p, _ := New("http://example.com", 0, 0, []string{"Authorization"})
+	p, _ := New("http://example.com", 0, 0, []string{"Authorization"}, nil)
 
 	req1 := httptest.NewRequest("GET", "/api/data", nil)
 	req1.Header.Set("Authorization", "Bearer token1")
@@ -41,7 +41,7 @@ func TestCacheKeyWithHeaders(t *testing.T) {
 
 func TestCacheKeyWithMultipleHeaders(t *testing.T) {
 	// Proxy with multiple headers in cache key
-	p, _ := New("http://example.com", 0, 0, []string{"Authorization", "Accept-Language"})
+	p, _ := New("http://example.com", 0, 0, []string{"Authorization", "Accept-Language"}, nil)
 
 	req1 := httptest.NewRequest("GET", "/api/data", nil)
 	req1.Header.Set("Authorization", "Bearer token1")
@@ -68,7 +68,7 @@ func TestCacheKeyWithMultipleHeaders(t *testing.T) {
 
 func TestCacheKeyWithMissingHeaders(t *testing.T) {
 	// Proxy configured to use Authorization in key
-	p, _ := New("http://example.com", 0, 0, []string{"Authorization", "X-Custom"})
+	p, _ := New("http://example.com", 0, 0, []string{"Authorization", "X-Custom"}, nil)
 
 	req1 := httptest.NewRequest("GET", "/api/data", nil)
 	req1.Header.Set("Authorization", "Bearer token1")
@@ -99,7 +99,7 @@ func TestCacheKeyWithMissingHeaders(t *testing.T) {
 
 func TestCacheKeyWithoutHeaderConfig(t *testing.T) {
 	// Proxy without header configuration (backward compatibility)
-	p, _ := New("http://example.com", 0, 0, nil)
+	p, _ := New("http://example.com", 0, 0, nil, nil)
 
 	req := httptest.NewRequest("GET", "/api/data?page=1", nil)
 	req.Header.Set("Authorization", "Bearer token1")
@@ -116,7 +116,7 @@ func TestCacheKeyWithoutHeaderConfig(t *testing.T) {
 
 func TestCacheKeyHeadersCaseSensitive(t *testing.T) {
 	// Test that header names in config match case-insensitively
-	p, _ := New("http://example.com", 0, 0, []string{"authorization"})
+	p, _ := New("http://example.com", 0, 0, []string{"authorization"}, nil)
 
 	req := httptest.NewRequest("GET", "/api/data", nil)
 	req.Header.Set("Authorization", "Bearer token1") // Capital A
