@@ -77,13 +77,12 @@ func EnsureLeadingSlash(s string) string {
 
 // RequestContextWithTimeout creates a context with timeout,
 // respecting parent's deadline if shorter
-func RequestContextWithTimeout(parent context.Context, d time.Duration) context.Context {
+func RequestContextWithTimeout(parent context.Context, d time.Duration) (context.Context, context.CancelFunc) {
 	if deadline, ok := parent.Deadline(); ok && time.Until(deadline) < d {
-		// Parent already has shorter timeout
-		return parent
+		// Parent already has shorter timeout - return no-op cancel
+		return parent, func() {}
 	}
-	ctx, _ := context.WithTimeout(parent, d)
-	return ctx
+	return context.WithTimeout(parent, d)
 }
 
 // ZeroOrExpiry returns zero time or expiry time based on TTL

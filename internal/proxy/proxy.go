@@ -72,8 +72,11 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Body != nil {
 		body = r.Body
 	}
+	ctx, cancel := utils.RequestContextWithTimeout(r.Context(), p.client.Timeout)
+	defer cancel()
+
 	req, err := http.NewRequestWithContext(
-		utils.RequestContextWithTimeout(r.Context(), p.client.Timeout),
+		ctx,
 		r.Method,
 		upURL.String(),
 		body,

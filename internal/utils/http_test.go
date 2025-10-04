@@ -129,7 +129,8 @@ func TestCloneHeaderSanitized(t *testing.T) {
 func TestRequestContextWithTimeout(t *testing.T) {
 	// Parent context with no deadline
 	parent := context.Background()
-	ctx := RequestContextWithTimeout(parent, 1*time.Second)
+	ctx, cancel := RequestContextWithTimeout(parent, 1*time.Second)
+	defer cancel()
 
 	deadline, ok := ctx.Deadline()
 	if !ok {
@@ -140,9 +141,10 @@ func TestRequestContextWithTimeout(t *testing.T) {
 	}
 
 	// Parent context with shorter deadline
-	parentWithDeadline, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-	defer cancel()
-	ctx2 := RequestContextWithTimeout(parentWithDeadline, 1*time.Second)
+	parentWithDeadline, cancelParent := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancelParent()
+	ctx2, cancel2 := RequestContextWithTimeout(parentWithDeadline, 1*time.Second)
+	defer cancel2()
 
 	// Should keep parent's shorter deadline
 	deadline2, ok := ctx2.Deadline()
