@@ -1,8 +1,8 @@
 # Aegis
 
-[![CI](https://github.com/USER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/USER/REPO/actions/workflows/ci.yml)
-[![Docker](https://github.com/USER/REPO/actions/workflows/docker.yml/badge.svg)](https://github.com/USER/REPO/actions/workflows/docker.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/USER/REPO)](https://goreportcard.com/report/github.com/USER/REPO)
+[![CI](https://github.com/borsuk85/aegis-proxy/actions/workflows/ci.yml/badge.svg)](https://github.com/borsuk85/aegis-proxy/actions/workflows/ci.yml)
+[![Docker](https://github.com/borsuk85/aegis-proxy/actions/workflows/docker.yml/badge.svg)](https://github.com/borsuk85/aegis-proxy/actions/workflows/docker.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/borsuk85/aegis-proxy)](https://goreportcard.com/report/github.com/borsuk85/aegis-proxy)
 
 Caching reverse proxy with failover mechanism providing high availability for upstream services.
 
